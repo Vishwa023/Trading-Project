@@ -1,5 +1,6 @@
 const log = require('simple-node-logger').createSimpleLogger();
 var Trade = require("../models/trade.js");
+var Portfolio = require("../models/portfolio");
 
 exports.showTrades = function (req, res) {
 
@@ -30,10 +31,75 @@ exports.addTrades = function (req, res) {
             console.log('Error while finding ticker symbol to add a trade ....');
         } else {
             if (trade == null) {
+
+                console.log('Trade Not found while adding a Trade in TradeList');
+
                 let newTrade = new Trade();
                 newTrade.tradeStockTickerSymbol = req.body.tradeStockTickerSymbol;
                 req.body.tradeDetails.forEach(function (t) {
                     newTrade.tradeDetails.push(t);
+                });
+
+                Portfolio.findOne({
+                    tickerSymbol: req.body.tradeStockTickerSymbol
+                }, function (err, stock) {
+                    if (err) {
+                        console.log(err);
+                        console.log('Error while finding the stock in portfolio .... ');
+                    } else {
+                        console.log('stock--->>',stock);
+                        // console.log('stock - size--->>>',stock.length);
+                        if (stock == null) {
+
+                            console.log('stock not found in portfolio while adding a trade');
+
+                            if (req.body.tradeDetails.tradeType == "SELL") {
+                                console.log('you do not have enough quantity to sell');
+                                res.json({
+                                    message: "You can't sell stocks as you haven't buy them yet!!"
+                                });
+                            } else {
+                                let newStock = new Portfolio();
+                                console.log(req.body.tradeDetails);
+                                newStock.tickerSymbol = req.body.tradeStockTickerSymbol;
+                                newStock.averagePrice = req.body.tradeDetails[0].tradeStockPrice;
+                                newStock.shareQty = req.body.tradeDetails[0].tradeQty;
+                                console.log(newStock);
+                                newStock.save();
+                            }
+                        } else {
+
+                            console.log('stock is found in portfolio while adding a trade');
+                            console.log(stock);
+
+                            if(req.body.tradeDetails.tradeType == "SELL") {
+                                if(req.body.tradeDetails.tradeQty > stock.shareQty) {
+                                    console.log('you do not have enough quantity to sell');
+                                    res.json({
+                                        message: "You can't sell stocks as you haven't buy them yet!!"
+                                    });
+                                } else {
+                                    stock.shareQty -= req.body.tradeDetails[0].tradeQty;
+                                    stock.save();
+                                }
+
+                            } else {
+                                stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (req.body.tradeDetails[0].tradeQty * req.body.tradeDetails[0].tradeStockPrice)) / (stock.shareQty + req.body.tradeDetails[0].tradeQty);
+                                stock.shareQty += req.body.tradeDetails[0].tradeQty;
+                                console.log(stock);
+                                stock.save();
+                                // stock.save(function(err) {
+                                //     if(err) {
+                                //         console.log(err);
+                                //     } else {
+                                //         res.json({
+                                //             data: stock
+                                //         });
+                                //     }
+                                // });
+                            }
+                        }
+                    }
                 });
 
                 newTrade.save(function (err) {
