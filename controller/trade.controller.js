@@ -40,67 +40,67 @@ exports.addTrades = function (req, res) {
                     newTrade.tradeDetails.push(t);
                 });
 
-                Portfolio.findOne({
-                    tickerSymbol: req.body.tradeStockTickerSymbol
-                }, function (err, stock) {
-                    if (err) {
-                        console.log(err);
-                        console.log('Error while finding the stock in portfolio .... ');
-                    } else {
-                        console.log('stock--->>',stock);
-                        // console.log('stock - size--->>>',stock.length);
-                        if (stock == null) {
+                // Portfolio.findOne({
+                //     tickerSymbol: req.body.tradeStockTickerSymbol
+                // }, function (err, stock) {
+                //     if (err) {
+                //         console.log(err);
+                //         console.log('Error while finding the stock in portfolio .... ');
+                //     } else {
+                //         console.log('stock--->>',stock);
+                //         // console.log('stock - size--->>>',stock.length);
+                //         if (stock == null) {
 
-                            console.log('stock not found in portfolio while adding a trade');
+                //             console.log('stock not found in portfolio while adding a trade');
 
-                            if (req.body.tradeDetails.tradeType == "SELL") {
-                                console.log('you do not have enough quantity to sell');
-                                res.json({
-                                    message: "You can't sell stocks as you haven't buy them yet!!"
-                                });
-                            } else {
-                                let newStock = new Portfolio();
-                                console.log(req.body.tradeDetails);
-                                newStock.tickerSymbol = req.body.tradeStockTickerSymbol;
-                                newStock.averagePrice = req.body.tradeDetails[0].tradeStockPrice;
-                                newStock.shareQty = req.body.tradeDetails[0].tradeQty;
-                                console.log(newStock);
-                                newStock.save();
-                            }
-                        } else {
+                //             if (req.body.tradeDetails.tradeType == "SELL") {
+                //                 console.log('you do not have enough quantity to sell');
+                //                 res.json({
+                //                     message: "You can't sell stocks as you haven't buy them yet!!"
+                //                 });
+                //             } else {
+                //                 let newStock = new Portfolio();
+                //                 console.log(req.body.tradeDetails);
+                //                 newStock.tickerSymbol = req.body.tradeStockTickerSymbol;
+                //                 newStock.averagePrice = req.body.tradeDetails[0].tradeStockPrice;
+                //                 newStock.shareQty = req.body.tradeDetails[0].tradeQty;
+                //                 console.log(newStock);
+                //                 newStock.save();
+                //             }
+                //         } else {
 
-                            console.log('stock is found in portfolio while adding a trade');
-                            console.log(stock);
+                //             console.log('stock is found in portfolio while adding a trade');
+                //             console.log(stock);
 
-                            if(req.body.tradeDetails.tradeType == "SELL") {
-                                if(req.body.tradeDetails.tradeQty > stock.shareQty) {
-                                    console.log('you do not have enough quantity to sell');
-                                    res.json({
-                                        message: "You can't sell stocks as you haven't buy them yet!!"
-                                    });
-                                } else {
-                                    stock.shareQty -= req.body.tradeDetails[0].tradeQty;
-                                    stock.save();
-                                }
+                //             if(req.body.tradeDetails[0].tradeType == "SELL") {
+                //                 if(req.body.tradeDetails[0].tradeQty > stock.shareQty) {
+                //                     console.log('you do not have enough quantity to sell');
+                //                     res.json({
+                //                         message: "You can't sell stocks as you haven't buy them yet!!"
+                //                     });
+                //                 } else {
+                //                     stock.shareQty -= req.body.tradeDetails[0].tradeQty;
+                //                     stock.save();
+                //                 }
 
-                            } else {
-                                stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (req.body.tradeDetails[0].tradeQty * req.body.tradeDetails[0].tradeStockPrice)) / (stock.shareQty + req.body.tradeDetails[0].tradeQty);
-                                stock.shareQty += req.body.tradeDetails[0].tradeQty;
-                                console.log(stock);
-                                stock.save();
-                                // stock.save(function(err) {
-                                //     if(err) {
-                                //         console.log(err);
-                                //     } else {
-                                //         res.json({
-                                //             data: stock
-                                //         });
-                                //     }
-                                // });
-                            }
-                        }
-                    }
-                });
+                //             } else {
+                //                 stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (req.body.tradeDetails[0].tradeQty * req.body.tradeDetails[0].tradeStockPrice)) / (stock.shareQty + req.body.tradeDetails[0].tradeQty);
+                //                 stock.shareQty += req.body.tradeDetails[0].tradeQty;
+                //                 console.log(stock);
+                //                 stock.save();
+                //                 // stock.save(function(err) {
+                //                 //     if(err) {
+                //                 //         console.log(err);
+                //                 //     } else {
+                //                 //         res.json({
+                //                 //             data: stock
+                //                 //         });
+                //                 //     }
+                //                 // });
+                //             }
+                //         }
+                //     }
+                // });
 
                 newTrade.save(function (err) {
                     if (err) {
@@ -128,6 +128,202 @@ exports.addTrades = function (req, res) {
                     }
                 });
             }
+
+            Portfolio.findOne({
+                tickerSymbol: req.body.tradeStockTickerSymbol
+            }, function (err, stock) {
+                if (err) {
+                    console.log(err);
+                    console.log('Error while finding the stock in portfolio .... ');
+                } else {
+                    console.log('stock--->>', stock);
+                    // console.log('stock - size--->>>',stock.length);
+                    if (stock == null) {
+
+                        console.log('stock not found in portfolio while adding a trade');
+
+                        if (req.body.tradeDetails.tradeType == "SELL") {
+                            console.log('you do not have enough quantity to sell');
+                            res.json({
+                                message: "You can't sell stocks as you haven't buy them yet!!"
+                            });
+                        } else {
+                            let newStock = new Portfolio();
+                            console.log(req.body.tradeDetails);
+                            newStock.tickerSymbol = req.body.tradeStockTickerSymbol;
+                            newStock.averagePrice = req.body.tradeDetails[0].tradeStockPrice;
+                            newStock.shareQty = req.body.tradeDetails[0].tradeQty;
+                            console.log(newStock);
+                            newStock.save();
+                        }
+                    } else {
+
+                        console.log('stock is found in portfolio while adding a trade');
+                        console.log(stock);
+
+                        if (req.body.tradeDetails[0].tradeType == "SELL") {
+                            if (req.body.tradeDetails[0].tradeQty > stock.shareQty) {
+                                console.log('you do not have enough quantity to sell');
+                                res.json({
+                                    message: "You can't sell stocks as you haven't buy them yet!!"
+                                });
+                            } else {
+                                stock.shareQty -= req.body.tradeDetails[0].tradeQty;
+                                stock.save();
+                            }
+
+                        } else {
+                            console.log(req.body.tradeDetails);
+                            stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (req.body.tradeDetails[0].tradeQty * req.body.tradeDetails[0].tradeStockPrice)) / (stock.shareQty + req.body.tradeDetails[0].tradeQty);
+                            stock.shareQty += req.body.tradeDetails[0].tradeQty;
+                            console.log(stock);
+                            stock.save();
+                            // stock.save(function(err) {
+                            //     if(err) {
+                            //         console.log(err);
+                            //     } else {
+                            //         res.json({
+                            //             data: stock
+                            //         });
+                            //     }
+                            // });
+                        }
+                    }
+                }
+            });
+        }
+    });
+};
+
+exports.updateParticularTrade = function (req, res) {
+
+    log.info('updateParticularTrade -> function - started');
+
+    Trade.findOne({
+        tradeStockTickerSymbol: req.params.ticker
+    }, function (err, foundTrade) {
+
+        if (err) {
+            console.log(err);
+            console.log('error while finding trade for update ......');
+        } else {
+            console.log(foundTrade);
+            let td = foundTrade.tradeDetails;
+            let reqUpdateDetails = req.body.tradeDetails[0];
+            td.forEach(function (val) {
+                if (val._id == req.params.tradeId) {
+
+                    let tradeUpdated = false;
+
+                    Portfolio.findOne({
+                        tickerSymbol: req.params.ticker
+                    }, function (err, stock) {
+
+                        console.log('Stock found while updating a trade --->> ', stock);
+
+                        if(val.tradeType == "BUY") {
+
+                            if(reqUpdateDetails.tradeType == "BUY") {
+
+                                stock.shareQty -= val.tradeQty;
+
+                                stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (reqUpdateDetails.tradeQty * reqUpdateDetails.tradeStockPrice)) / (stock.shareQty + reqUpdateDetails.tradeQty);
+
+                                stock.shareQty += reqUpdateDetails.tradeQty;
+
+                                tradeUpdated = true;
+
+                            } else {
+
+                                let stkQty = stock.shareQty;
+
+                                stock.shareQty -= val.tradeQty;
+
+                                stock.shareQty -= reqUpdateDetails.tradeQty;
+
+                                if(stock.shareQty < 0) {
+
+                                    stock.shareQty = stkQty;
+
+                                    console.log('you do not have enough quantity to sell');
+                                    res.json({
+                                        message: "You can't sell stocks as you haven't buy them yet!!"
+                                    });
+
+                                } else {
+
+                                    tradeUpdated = true;
+
+                                }
+
+                            }
+
+                        } else {
+
+                            if(reqUpdateDetails.tradeType == "SELL") {
+
+                                let stkQty = stock.shareQty;
+
+                                stock.shareQty += val.tradeQty;
+
+                                stock.shareQty -= reqUpdateDetails.tradeQty;
+
+                                if(stock.shareQty < 0) {
+                                 
+                                    stock.shareQty = stkQty;
+
+                                    console.log('you do not have enough quantity to sell');
+                                    res.json({
+                                        message: "You can't sell stocks as you haven't buy them yet!!"
+                                    });
+
+                                } else {
+
+                                    tradeUpdated = true;
+
+                                }
+
+                            } else {
+
+                                stock.shareQty += val.tradeQty;
+
+                                stock.averagePrice = ((stock.averagePrice * stock.shareQty) + (reqUpdateDetails.tradeQty * reqUpdateDetails.tradeStockPrice)) / (stock.shareQty + reqUpdateDetails.tradeQty);
+
+                                stock.shareQty += reqUpdateDetails.tradeQty;
+
+                                tradeUpdated = true;
+
+                            }
+
+                        }
+
+                        stock.save();
+
+                        if(tradeUpdated) {
+
+                            val.tradeStockPrice = reqUpdateDetails.tradeStockPrice ? reqUpdateDetails.tradeStockPrice : val.tradeStockPrice;
+                            val.tradeType = reqUpdateDetails.tradeType ? reqUpdateDetails.tradeType : val.tradeType;
+                            val.tradeQty = reqUpdateDetails.tradeQty ? reqUpdateDetails.tradeQty : val.tradeQty;
+
+                            console.log('final Val -> ', val);
+
+                            console.log('foundTrade -> ', foundTrade);
+                            foundTrade.save(function (err) {
+                                if (err) {
+                                    res.json(err);
+                                } else {
+                                    res.json({
+                                        message: 'Updated A Particular Trade!',
+                                        data: foundTrade
+                                    });
+                                }
+                            });
+
+                        }
+
+                    });
+                }
+            });
         }
     });
 };
@@ -157,45 +353,6 @@ exports.showParticularTrade = function (req, res) {
     });
 };
 
-
-
-exports.updateParticularTrade = function (req, res) {
-
-    log.info('updateParticularTrade -> function - started');
-
-    Trade.findOne({
-        tradeStockTickerSymbol: req.params.ticker
-    }, function (err, foundTrade) {
-
-        if (err) {
-            console.log(err);
-            console.log('error while finding trade for update ......');
-        } else {
-            console.log(foundTrade);
-            let td = foundTrade.tradeDetails;
-            let reqUpdateDetails = req.body.tradeDetails;
-            td.forEach(function (val) {
-                if (val._id == req.params.tradeId) {
-                    val.tradeStockPrice = reqUpdateDetails[0].tradeStockPrice ? reqUpdateDetails[0].tradeStockPrice : val.tradeStockPrice;
-                    val.tradeType = reqUpdateDetails[0].tradeType ? reqUpdateDetails[0].tradeType : val.tradeType;
-                    val.tradeQty = reqUpdateDetails[0].tradeQty ? reqUpdateDetails[0].tradeQty : val.tradeQty;
-                }
-            });
-            console.log(foundTrade);
-            foundTrade.save(function (err) {
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json({
-                        message: 'Updated A Particular Trade!',
-                        data: foundTrade
-                    });
-                }
-            });
-        }
-    });
-};
-
 exports.removeParticularTrade = function (req, res) {
 
     log.info('removeParticularTrade -> function - started');
@@ -204,6 +361,8 @@ exports.removeParticularTrade = function (req, res) {
         tradeStockTickerSymbol: req.params.ticker
     }, function (err, foundTrade) {
 
+        console.log(foundTrade);
+
         if (err) {
             console.log(err);
             console.log('error while finding trade for update ......');
@@ -212,6 +371,22 @@ exports.removeParticularTrade = function (req, res) {
 
             td.forEach(function (val) {
                 if (val._id == req.params.tradeId) {
+
+                    Portfolio.findOne({
+                        tickerSymbol: req.params.ticker
+                    }, function (err, stock) {
+                        if (err) {
+                            console.log('Error while finding stock in portfolio when removing a trade');
+                        } else {
+                            if (val.tradeType == "BUY") {
+                                stock.shareQty -= val.tradeQty;
+                            } else {
+                                stock.shareQty += val.tradeQty;
+                            }
+                        }
+                        stock.save();
+                    });
+
                     td.remove(val);
                 }
             });

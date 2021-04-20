@@ -1,15 +1,13 @@
 
-var apiRoutes        = require("./api-routes"),
-    bodyParser       = require("body-parser"),
-    mongoose         = require("mongoose"),
-    expressSanitizer = require("express-sanitizer"),
-    express          = require("express"),
-    app              = express(),
-    methodOverride   = require("method-override");
+var apiRoutes         = require("./api-routes"),
+    bodyParser        = require("body-parser"),
+    connectDB         = require("./connection/db"),
+    expressSanitizer  = require("express-sanitizer"),
+    express           = require("express"),
+    app               = express(),
+    methodOverride    = require("method-override");
 
-mongoose.connect("mongodb://localhost/trading_project", {useNewUrlParser: true, useUnifiedTopology: true })
-.then(() => console.log('successfully connected with mongoose'))
-.catch((err) => console.log(err));
+connectDB();
 
 app.set("view engine", "ejs");
 app.use(express.static("public"));
