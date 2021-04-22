@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//Schema for the portfolio
 const PortfolioSchema = new Schema({
     tickerSymbol: String,
     averagePrice: Number,
