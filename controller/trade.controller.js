@@ -502,10 +502,10 @@ exports.removeParticularTrade = function (req, res) {
                     //If the requested trade is not present in the trade list
                     if (!isTradePresent) {
 
-                        console.log('Trade Id is not present in the list for update');
+                        console.log('Trade Id is not present in the list for Remove');
 
                         res.json({
-                            message: "Trade Id is not present in the list for update!!!"
+                            message: "Trade Id is not present in the list for Remove!!!"
                         });
 
                     } else {
